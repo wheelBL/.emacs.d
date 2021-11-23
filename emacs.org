@@ -9,7 +9,7 @@ This is the configuration we've been building in the *Emacs From Scratch* series
 
 The following variables are used to tweak some of the configuration pieces for use in the live streams so you might need to adjust them for your local machine if you try to use this configuration directly.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 
   ;; NOTE: init.el is now generated from Emacs.org.  Please edit that file
   ;;       in Emacs and init.el will be generated automatically!
@@ -21,7 +21,7 @@ The following variables are used to tweak some of the configuration pieces for u
   ;; Make frame transparency overridable
   (defvar wheel/frame-transparency '(90 . 90))
 
-#+end_src
+#+END_SRC
 
 * Tips for Use
 
@@ -29,7 +29,7 @@ In this document I've added links in many places that lead you to documentation 
 
 * Startup Performance
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 
   ;; The default is 800 kilobytes.  Measured in bytes.
   (setq gc-cons-threshold (* 50 1000 1000))
@@ -43,13 +43,13 @@ In this document I've added links in many places that lead you to documentation 
 
   (add-hook 'emacs-startup-hook #'wheel/display-startup-time)
 
-#+end_src
+#+END_SRC
 
 * Package System Setup
 
 Emacs has a built in package manager but it doesn't make it easy to automatically install packages on a new system the first time you pull down your configuration.  [[https://github.com/jwiegley/use-package][use-package]] is a really helpful package used in this configuration to make it a lot easier to automate the installation and configuration of everything else we use.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 
   ;; Initialize package sources
   (require 'package)
@@ -69,7 +69,7 @@ Emacs has a built in package manager but it doesn't make it easy to automaticall
   (require 'use-package)
   (setq use-package-always-ensure t)
 
-#+end_src
+#+END_SRC
 
 ** Automatic Package Updates
 
@@ -77,7 +77,7 @@ The auto-package-update package helps us keep our Emacs packages up to date!  It
 
 You can also use =M-x auto-package-update-now= to update right now!
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 
   (use-package auto-package-update
     :custom
@@ -88,14 +88,43 @@ You can also use =M-x auto-package-update-now= to update right now!
     (auto-package-update-maybe)
     (auto-package-update-at-time "09:00"))
 
-#+end_src
+#+END_SRC
 
+* Basic Package
+#+BEGIN_SRC emacs-lisp
+  (use-package hydra
+    :defer t)
+
+  (use-package pretty-hydra
+    :after hydra)
+#+END_SRC
+** Text Edit
+*** Multi Edit
+    ref [[https://sam217pa.github.io/2016/09/11/nuclear-power-editing-via-ivy-and-ag/][Nuclear weapon multi-editing via Ivy and Ag]]
+    =counsel-rg= search string I want to modify in current directory.
+    =C-c C-o(ivy-occur)= in search result. It opens an ivy-occur buffer.
+    =C-x C-q(ivy-wgrep-change-to-wgrep-mode)= edit it.
+    usee normal search and replace techniques, like Evil-ex commands =:%s/pattern/replace/g=
+    =C-c C-c(wgrep-finish-edit)=
+#+BEGIN_SRC emacs-lisp
+  (use-package wgrep)
+#+END_SRC
+** Optimize My Self
+*** Find frequently used commands
+#+BEGIN_SRC emacs-lisp
+  (use-package keyfreq
+    :config
+    (setq keyfreq-excluded-commands
+	  '(forward-char
+	    backward-char
+	    previous-line
+	    next-line))
+    (keyfreq-mode 1)
+    (keyfreq-autosave-mode 1))
+#+END_SRC
 * Keep Folders Clean
-
 We use the [[https://github.com/emacscollective/no-littering/blob/master/no-littering.el][no-littering]] package to keep folders where we edit files and the Emacs configuration folder clean!  It knows about a wide variety of variables for built in Emacs features as well as those from community packages so it can be much easier than finding and setting these variables yourself.
-
-#+begin_src emacs-lisp
-
+#+BEGIN_SRC emacs-lisp
   ;; NOTE: If you want to move everything out of the ~/.emacs.d folder
   ;; reliably, set `user-emacs-directory` before loading no-littering!
   ;(setq user-emacs-directory "~/.cache/emacs")
@@ -110,14 +139,12 @@ We use the [[https://github.com/emacscollective/no-littering/blob/master/no-litt
   ;; auto save files in the same path as it uses for sessions
   (setq auto-save-file-name-transforms
         `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
-
-#+end_src
-
+#+END_SRC
 * Basic UI Configuration
 
 This section configures basic UI settings that remove unneeded elements to make Emacs look a lot more minimal and modern.  If you're just getting started in Emacs, the menu bar might be helpful so you can remove the =(menu-bar-mode -1)= line if you'd like to still see that.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 
   (setq inhibit-startup-message t)
 
@@ -148,13 +175,13 @@ This section configures basic UI settings that remove unneeded elements to make 
                   eshell-mode-hook))
     (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
-#+end_src
+#+END_SRC
 
 ** Font Configuration
 
 I am using the [[https://github.com/tonsky/FiraCode][Fira Code]] and [[https://fonts.google.com/specimen/Cantarell][Cantarell]] fonts for this configuration which will more than likely need to be installed on your machine.  Both can usually be found in the various Linux distro package managers or downloaded from the links above.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 
 (set-face-attribute 'default nil :font "Fira Code Retina" :height wheel/default-font-size)
 
@@ -164,13 +191,12 @@ I am using the [[https://github.com/tonsky/FiraCode][Fira Code]] and [[https://f
 ;; Set the variable pitch face
 (set-face-attribute 'variable-pitch nil :font "Cantarell" :height wheel/default-variable-font-size :weight 'regular)
 
-#+end_src
-
+#+END_SRC
 * Keybinding Configuration
 
 This configuration uses [[https://evil.readthedocs.io/en/latest/index.html][evil-mode]] for a Vi-like modal editing experience.  [[https://github.com/noctuid/general.el][general.el]] is used for easy keybinding configuration that integrates well with which-key.  [[https://github.com/emacs-evil/evil-collection][evil-collection]] is used to automatically configure various Emacs modes with Vi-like keybindings for evil-mode.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   ;; Make ESC quit prompts
   (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
@@ -183,15 +209,21 @@ This configuration uses [[https://evil.readthedocs.io/en/latest/index.html][evil
       :global-prefix "C-SPC")
 
     (wheel/leader-keys
+      "/" '(swiper :wk "swiper")
+      "g" '(magit :wk "magit")
       "s" '(search-files/body :wk "search")
       "p" '(:ignore t :wk "projectile")
       "pf" '(projectile-find-file-in-known-projects :wk "file")
+      "pb" '(counsel-projectile-switch-to-buffer :wk "buffer")
+      "pd" '(counsel-projectile-find-dir :wk "dir")
+      "pp" '(counsel-projectile-switch-project :wk "project")
       "b" '(hydra-buffer/body :wk "buffer")
       "t" '(hydra-toggle/body :wk "toggles")
       "w" '(hydra-window/body :wk "window")
       ;;      "tt" '(counsel-load-theme :wk "choose theme")
       "f" '(:ignore t :wk "files")
-      "fe" '(lambda () (interactive) (find-file (expand-file-name "~/.emacs.d/emacs.org")) :wk "emacs.org")))
+      "fe" '(lambda () (interactive) (find-file (expand-file-name "~/.emacs.d/emacs.org")) :wk "emacs.org")
+      "ff" '(counsel-find-file :wk "open")))
 
   (defhydra hydra-toggle (:color pink :hint nil)
     "
@@ -202,9 +234,9 @@ This configuration uses [[https://evil.readthedocs.io/en/latest/index.html][evil
     _f_ auto-fill-mode:    %`auto-fill-function
     _h_ highlight          %`highlight-nonselected-windows
     _t_ truncate-lines:    %`truncate-lines
+    _w_ show-trailing-whitespace:    %`show-trailing-whitespace
     _l_ org link display
     "
-					  ;_w_ whitespace-mode:   %`whitespace-mode
     ("a" abbrev-mode)
     ("b" (setq make-backup-files (not make-backup-files)))
     ("d" toggle-debug-on-error)
@@ -212,11 +244,12 @@ This configuration uses [[https://evil.readthedocs.io/en/latest/index.html][evil
     ("f" auto-fill-mode)
     ("h" (setq highlight-nonselected-windows (not highlight-nonselected-windows)))
     ("t" toggle-truncate-lines)
-					  ;  ("w" whitespace-mode)
     ("l" org-toggle-link-display)
     ("i" illiterate)
     ("q" nil "quit")
-    ("c" command-log-mode))
+    ("c" command-log-mode)
+    ("w" (setq show-trailing-whitespace (not show-trailing-whitespace))))
+;  ("w" whitespace-mode)
 
 					  ;(if (boundp 'command-log-mode)
 					  ;    (clm/open-command-log-buffer)
@@ -296,30 +329,30 @@ This configuration uses [[https://evil.readthedocs.io/en/latest/index.html][evil
     (setq-default evil-escape-key-sequence "jk")
     (setq-default evil-escape-delay 0.11)
     (evil-escape-mode))
-#+end_src
+#+END_SRC
 
 * UI Configuration
 ** Command Log Mode
 
 [[https://github.com/lewang/command-log-mode][command-log-mode]] is useful for displaying a panel showing each key binding you use in a panel on the right side of the frame.  Great for live streams and screencasts!
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 
   (use-package command-log-mode
-    :commands command-log-mode)
+    :init (command-log-mode))
 
-#+end_src
+#+END_SRC
 
 ** Color Theme
 
 [[https://github.com/hlissner/emacs-doom-themes][doom-themes]] is a great set of themes with a lot of variety and support for many different Emacs modes.  Taking a look at the [[https://github.com/hlissner/emacs-doom-themes/tree/screenshots][screenshots]] might help you decide which one you like best.  You can also run =M-x counsel-load-theme= to choose between them easily.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 
 (use-package doom-themes
   :init (load-theme 'doom-palenight t))
 
-#+end_src
+#+END_SRC
 
 ** Better Modeline
 
@@ -327,7 +360,7 @@ This configuration uses [[https://evil.readthedocs.io/en/latest/index.html][evil
 
 *NOTE:* The first time you load your configuration on a new machine, you'll need to run `M-x all-the-icons-install-fonts` so that mode line icons display correctly.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 
 (use-package all-the-icons)
 
@@ -335,13 +368,13 @@ This configuration uses [[https://evil.readthedocs.io/en/latest/index.html][evil
   :init (doom-modeline-mode 1)
   :custom ((doom-modeline-height 15)))
 
-#+end_src
+#+END_SRC
 
 ** Which Key
 
 [[https://github.com/justbur/emacs-which-key][which-key]] is a useful UI panel that appears when you start pressing any key binding in Emacs to offer you all possible completions for the prefix.  For example, if you press =C-c= (hold control and press the letter =c=), a panel will appear at the bottom of the frame displaying all of the bindings under that prefix and which command they run.  This is very useful for learning the possible key bindings in the mode of your current buffer.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 
   (use-package which-key
     :defer 0
@@ -350,7 +383,7 @@ This configuration uses [[https://evil.readthedocs.io/en/latest/index.html][evil
     (which-key-mode)
     (setq which-key-idle-delay 1))
 
-#+end_src
+#+END_SRC
 
 ** Ivy and Counsel
 
@@ -358,7 +391,7 @@ This configuration uses [[https://evil.readthedocs.io/en/latest/index.html][evil
 
 [[https://github.com/Yevgnen/ivy-rich][ivy-rich]] adds extra columns to a few of the Counsel commands to provide more information about each item.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 
   (use-package ivy
     :diminish
@@ -392,7 +425,7 @@ This configuration uses [[https://evil.readthedocs.io/en/latest/index.html][evil
     :config
     (counsel-mode 1))
 
-#+end_src
+#+END_SRC
 
 *** Improved Candidate Sorting with prescient.el
 
@@ -400,7 +433,7 @@ prescient.el provides some helpful behavior for sorting Ivy completion candidate
 
 This Prescient configuration is optimized for use in System Crafters videos and streams, check out the [[https://youtu.be/T9kygXveEz0][video on prescient.el]] for more details on how to configure it!
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 
   (use-package ivy-prescient
     :after counsel
@@ -411,13 +444,13 @@ This Prescient configuration is optimized for use in System Crafters videos and 
     ;(prescient-persist-mode 1)
     (ivy-prescient-mode 1))
 
-#+end_src
+#+END_SRC
 
 ** Helpful Help Commands
 
 [[https://github.com/Wilfred/helpful][Helpful]] adds a lot of very helpful (get it?) information to Emacs' =describe-= command buffers.  For example, if you use =describe-function=, you will not only get the documentation about the function, you will also see the source code of the function and where it gets used in other places in the Emacs configuration.  It is very useful for figuring out how things work in Emacs.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 
   (use-package helpful
     :commands (helpful-callable helpful-variable helpful-command helpful-key)
@@ -430,19 +463,13 @@ This Prescient configuration is optimized for use in System Crafters videos and 
     ([remap describe-variable] . counsel-describe-variable)
     ([remap describe-key] . helpful-key))
 
-#+end_src
+#+END_SRC
 
 ** Text Scaling
 
 This is an example of using [[https://github.com/abo-abo/hydra][Hydra]] to design a transient key binding for quickly adjusting the scale of the text on screen.  We define a hydra that is bound to =C-s t s= and, once activated, =j= and =k= increase and decrease the text scale.  You can press any other key (or =f= specifically) to exit the transient key map.
 
-#+begin_src emacs-lisp
-
-  (use-package hydra
-    :defer t)
-    
-  (use-package pretty-hydra
-    :after hydra)
+#+BEGIN_SRC emacs-lisp
 
   (defhydra hydra-text-scale (:timeout 4)
     "scale text"
@@ -453,18 +480,20 @@ This is an example of using [[https://github.com/abo-abo/hydra][Hydra]] to desig
     ;; TODO
 ;  (wheel/leader-keys
 ;    "ts" '(hydra-text-scale/body :wk "scale text"))
-#+end_src
+#+END_SRC
 * Org Mode
 
 [[https://orgmode.org/][Org Mode]] is one of the hallmark features of Emacs.  It is a rich document editor, project planner, task and time tracker, blogging engine, and literate coding utility all wrapped up in one package.
+
+** Basic Configuration
 
 ** Better Font Faces
 
 The =wheel/org-font-setup= function configures various text faces to tweak the sizes of headings and use variable width fonts in most cases so that it looks more like we're editing a document in =org-mode=.  We switch back to fixed width (monospace) fonts for code blocks and tables so that they display correctly.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 
-  (defun wheel/org-font-setup ()
+(defun wheel/org-font-setup ()
     ;; Replace list hyphen with dot
     (font-lock-add-keywords 'org-mode
                             '(("^ *\\([-]\\) "
@@ -494,13 +523,13 @@ The =wheel/org-font-setup= function configures various text faces to tweak the s
     (set-face-attribute 'line-number nil :inherit 'fixed-pitch)
     (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch))
 
-#+end_src
+#+END_SRC
 
 ** Configure Babel Languages
 
 To execute or export code in =org-mode= code blocks, you'll need to set up =org-babel-load-languages= for each language you'd like to use.  [[https://orgmode.org/worg/org-contrib/babel/languages.html][This page]] documents all of the languages that you can use with =org-babel=.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 
   (with-eval-after-load 'org
     (org-babel-do-load-languages
@@ -510,12 +539,12 @@ To execute or export code in =org-mode= code blocks, you'll need to set up =org-
 
     (push '("conf-unix" . conf-unix) org-src-lang-modes))
 
-#+end_src
+#+END_SRC
 ** Auto-tangle Configuration Files
 
 This snippet adds a hook to =org-mode= buffers so that =wheel/org-babel-tangle-config= gets executed each time such a buffer gets saved.  This function checks to see if the file being saved is the Emacs.org file you're looking at right now, and if so, automatically exports the configuration here to the associated output files.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 
   ;; Automatically tangle our Emacs.org config file when we save it
   (defun wheel/org-babel-tangle-config ()
@@ -527,12 +556,37 @@ This snippet adds a hook to =org-mode= buffers so that =wheel/org-babel-tangle-c
 
   (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'wheel/org-babel-tangle-config)))
 
-#+end_src
+#+END_SRC
+** Templatee alist
+#+BEGIN_SRC emacs-lisp
+  (with-eval-after-load 'org
+    (progn
+      (add-to-list 'org-structure-template-alist '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
+      (add-to-list 'org-structure-template-alist '("sh" "#+BEGIN_SRC shell\n?\n#+END_SRC"))
+      (add-to-list 'org-structure-template-alist '("sh" "#+BEGIN_SRC python\n?\n#+END_SRC"))
+      )
+    )
+#+END_SRC
+** Nicer Heading Bullets
+#+BEGIN_SRC emacs-lisp
+(use-package org-bullets
+  :hook (org-mode . org-bullets-mode)
+  :custom
+  (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+#+END_SRC
+** Center Org Buffers
+#+BEGIN_SRC emacs-lisp
+(defun efs/org-mode-visual-fill ()
+  (setq visual-fill-column-width 100
+        visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
 
+(use-package visual-fill-column
+  :hook (org-mode . efs/org-mode-visual-fill))
+#+END_SRC
 * Development
 ** Languages
 *** IDE Features with lsp-mode
-
 **** lsp-mode
 
 We use the excellent [[https://emacs-lsp.github.io/lsp-mode/][lsp-mode]] to enable IDE-like functionality for many different programming languages via "language servers" that speak the [[https://microsoft.github.io/language-server-protocol/][Language Server Protocol]].  Before trying to set up =lsp-mode= for a particular language, check out the [[https://emacs-lsp.github.io/lsp-mode/page/languages/][documentation for your language]] so that you can learn which language servers are available and how to install them.
@@ -541,7 +595,7 @@ The =lsp-keymap-prefix= setting enables you to define a prefix for where =lsp-mo
 
 The =which-key= integration adds helpful descriptions of the various keys so you should be able to learn a lot just by pressing =C-c l= in a =lsp-mode= buffer and trying different things that you find there.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 
   (defun wheel/lsp-mode-setup ()
     (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
@@ -555,20 +609,20 @@ The =which-key= integration adds helpful descriptions of the various keys so you
     :config
     (lsp-enable-which-key-integration t))
 
-#+end_src
+#+END_SRC
 
 **** lsp-ui
 
 [[https://emacs-lsp.github.io/lsp-ui/][lsp-ui]] is a set of UI enhancements built on top of =lsp-mode= which make Emacs feel even more like an IDE.  Check out the screenshots on the =lsp-ui= homepage (linked at the beginning of this paragraph) to see examples of what it can do.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 
   (use-package lsp-ui
     :hook (lsp-mode . lsp-ui-mode)
     :custom
     (lsp-ui-doc-position 'bottom))
 
-#+end_src
+#+END_SRC
 
 **** lsp-treemacs
 
@@ -582,12 +636,12 @@ Try these commands with =M-x=:
 
 This package is built on the [[https://github.com/Alexander-Miller/treemacs][treemacs]] package which might be of some interest to you if you like to have a file browser at the left side of your screen in your editor.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 
   (use-package lsp-treemacs
     :after lsp)
 
-#+end_src
+#+END_SRC
 
 **** lsp-ivy
 
@@ -598,18 +652,18 @@ Try these commands with =M-x=:
 - =lsp-ivy-workspace-symbol= - Search for a symbol name in the current project workspace
 - =lsp-ivy-global-workspace-symbol= - Search for a symbol name in all active project workspaces
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 
   (use-package lsp-ivy
     :after lsp)
 
-#+end_src
+#+END_SRC
 
 *** Debugging with dap-mode
 
 [[https://emacs-lsp.github.io/dap-mode/][dap-mode]] is an excellent package for bringing rich debugging capabilities to Emacs via the [[https://microsoft.github.io/debug-adapter-protocol/][Debug Adapter Protocol]].  You should check out the [[https://emacs-lsp.github.io/dap-mode/page/configuration/][configuration docs]] to learn how to configure the debugger for your language.  Also make sure to check out the documentation for the debug adapter to see what configuration parameters are available to use for your debug templates!
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 
   (use-package dap-mode
     ;; Uncomment the config below if you want all UI panes to be hidden by default!
@@ -629,13 +683,13 @@ Try these commands with =M-x=:
       :prefix lsp-keymap-prefix
       "d" '(dap-hydra t :wk "debugger")))
 
-#+end_src
+#+END_SRC
 
 *** TypeScript
 
 This is a basic configuration for the TypeScript language so that =.ts= files activate =typescript-mode= when opened.  We're also adding a hook to =typescript-mode-hook= to call =lsp-deferred= so that we activate =lsp-mode= to get LSP features every time we edit TypeScript code.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 
   (use-package typescript-mode
     :mode "\\.ts\\'"
@@ -643,15 +697,15 @@ This is a basic configuration for the TypeScript language so that =.ts= files ac
     :config
     (setq typescript-indent-level 2))
 
-#+end_src
+#+END_SRC
 
 *Important note!*  For =lsp-mode= to work with TypeScript (and JavaScript) you will need to install a language server on your machine.  If you have Node.js installed, the easiest way to do that is by running the following command:
 
-#+begin_src shell :tangle no
+#+BEGIN_SRC shell :tangle no
 
 npm install -g typescript-language-server typescript
 
-#+end_src
+#+END_SRC
 
 This will install the [[https://github.com/theia-ide/typescript-language-server][typescript-language-server]] and the TypeScript compiler package.
 
@@ -661,8 +715,7 @@ We use =lsp-mode= and =dap-mode= to provide a more complete development environm
 
 There are a number of other language servers for Python so if you find that =pyls= doesn't work for you, consult the =lsp-mode= [[https://emacs-lsp.github.io/lsp-mode/page/languages/][language configuration documentation]] to try the others!
 
-#+begin_src emacs-lisp
-
+#+BEGIN_SRC emacs-lisp
   (use-package python-mode
     :ensure t
     :hook (python-mode . lsp-deferred)
@@ -674,15 +727,21 @@ There are a number of other language servers for Python so if you find that =pyl
     :config
     (require 'dap-python))
 
-  (use-package lsp-python-ms
-    :ensure t
-    :init (setq lsp-python-ms-auto-install-server t)
+  (use-package lsp-pyright
+    :preface
+    ;; Use yapf to format
+    (defun lsp-pyright-format-buffer ()
+      (interactive)
+      (when (and (executable-find "yapf") buffer-file-name)
+	(call-process "yapf" nil nil nil "-i" buffer-file-name)))
     :hook (python-mode . (lambda ()
-                           (require 'lsp-python-ms)
-                           (lsp))))
+			   (require 'lsp-pyright)
+			   (add-hook 'after-save-hook #'lsp-pyright-format-buffer t t)))
+    :init (when (executable-find "python3")
+	    (setq lsp-pyright-python-executable-cmd "python3")))
 
   (setq enable-local-variables :safe)
-#+end_src
+#+END_SRC
 
 ** Company Mode
 
@@ -690,7 +749,7 @@ There are a number of other language servers for Python so if you find that =pyl
 
 We also use [[https://github.com/sebastiencs/company-box][company-box]] to further enhance the look of the completions with icons and better overall presentation.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 
   (use-package company
     :after lsp-mode
@@ -706,13 +765,13 @@ We also use [[https://github.com/sebastiencs/company-box][company-box]] to furth
   (use-package company-box
     :hook (company-mode . company-box-mode))
 
-#+end_src
+#+END_SRC
 
 ** Projectile
 
 [[https://projectile.mx/][Projectile]] is a project management library for Emacs which makes it a lot easier to navigate around code projects for various languages.  Many packages integrate with Projectile so it's a good idea to have it installed even if you don't use its commands directly.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 
   (use-package projectile
     :diminish projectile-mode
@@ -730,13 +789,13 @@ We also use [[https://github.com/sebastiencs/company-box][company-box]] to furth
     :after projectile
     :config (counsel-projectile-mode))
 
-#+end_src
+#+END_SRC
 
 ** Magit
 
 [[https://magit.vc/][Magit]] is the best Git interface I've ever used.  Common Git operations are easy to execute quickly using Magit's command panel system.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 
   (use-package magit
     :commands magit-status
@@ -749,29 +808,28 @@ We also use [[https://github.com/sebastiencs/company-box][company-box]] to furth
   (use-package forge
     :after magit)
 
-#+end_src
+#+END_SRC
 
 ** Commenting
 
 Emacs' built in commenting functionality =comment-dwim= (usually bound to =M-;=) doesn't always comment things in the way you might expect so we use [[https://github.com/redguardtoo/evil-nerd-commenter][evil-nerd-commenter]] to provide a more familiar behavior.  I've bound it to =M-/= since other editors sometimes use this binding but you could also replace Emacs' =M-;= binding with this command.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 
   (use-package evil-nerd-commenter
     :bind ("M-/" . evilnc-comment-or-uncomment-lines))
 
-#+end_src
+#+END_SRC
 
 ** Rainbow Delimiters
 
 [[https://github.com/Fanael/rainbow-delimiters][rainbow-delimiters]] is useful in programming modes because it colorizes nested parentheses and brackets according to their nesting depth.  This makes it a lot easier to visually match parentheses in Emacs Lisp code without having to count them yourself.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
-
-#+end_src
+#+END_SRC
 
 * Terminals
 
@@ -792,7 +850,7 @@ Run a terminal with =M-x term!=
 - =C-c C-j= - Return to line-mode
 - If you have =evil-collection= installed, =term-mode= will enter char mode when you use Evil's Insert mode
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 
   (use-package term
     :commands term
@@ -803,18 +861,18 @@ Run a terminal with =M-x term!=
     ;; Match the default Bash shell prompt.  Update this if you have a custom prompt
     (setq term-prompt-regexp "^[^#$%>\n]*[#$%>] *"))
 
-#+end_src
+#+END_SRC
 
 *** Better term-mode colors
 
 The =eterm-256color= package enhances the output of =term-mode= to enable handling of a wider range of color codes so that many popular terminal applications look as you would expect them to.  Keep in mind that this package requires =ncurses= to be installed on your machine so that it has access to the =tic= program.  Most Linux distributions come with this program installed already so you may not have to do anything extra to use it.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 
   (use-package eterm-256color
     :hook (term-mode . eterm-256color-mode))
 
-#+end_src
+#+END_SRC
 
 ** vterm
 
@@ -822,7 +880,7 @@ The =eterm-256color= package enhances the output of =term-mode= to enable handli
 
 Make sure that you have the [[https://github.com/akermu/emacs-libvterm/#requirements][necessary dependencies]] installed before trying to use =vterm= because there is a module that will need to be compiled before you can use it successfully.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 
   (use-package vterm
     :commands vterm
@@ -831,7 +889,7 @@ Make sure that you have the [[https://github.com/akermu/emacs-libvterm/#requirem
     ;;(setq vterm-shell "zsh")                       ;; Set this to customize the shell to launch
     (setq vterm-max-scrollback 10000))
 
-#+end_src
+#+END_SRC
 
 ** shell-mode
 
@@ -846,13 +904,13 @@ Make sure that you have the [[https://github.com/akermu/emacs-libvterm/#requirem
 
 One advantage of =shell-mode= on Windows is that it's the only way to run =cmd.exe=, PowerShell, Git Bash, etc from within Emacs.  Here's an example of how you would set up =shell-mode= to run PowerShell on Windows:
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 
   (when (eq system-type 'windows-nt)
     (setq explicit-shell-file-name "powershell.exe")
     (setq explicit-powershell.exe-args '()))
 
-#+end_src
+#+END_SRC
 
 ** Eshell
 
@@ -873,7 +931,7 @@ For more thoughts on Eshell, check out these articles by Pierre Neidhardt:
 - https://ambrevar.xyz/emacs-eshell/index.html
 - https://ambrevar.xyz/emacs-eshell-versus-shell/index.html
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 
   (defun wheel/configure-eshell ()
     ;; Save command history when commands are entered
@@ -906,10 +964,9 @@ For more thoughts on Eshell, check out these articles by Pierre Neidhardt:
     (eshell-git-prompt-use-theme 'powerline))
 
 
-#+end_src
+#+END_SRC
 
 * File Management
-
 ** Dired
 
 Dired is a built-in file manager for Emacs that does some pretty amazing things!  Here are some key bindings you should try out:
@@ -974,7 +1031,7 @@ Dired is a built-in file manager for Emacs that does some pretty amazing things!
 
 *** Configuration
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 
   (use-package dired
     :ensure nil
@@ -1005,8 +1062,7 @@ Dired is a built-in file manager for Emacs that does some pretty amazing things!
     :config
     (evil-collection-define-key 'normal 'dired-mode-map
       "H" 'dired-hide-dotfiles-mode))
-
-#+end_src
+#+END_SRC
 
 * Applications
 
@@ -1015,32 +1071,32 @@ Dired is a built-in file manager for Emacs that does some pretty amazing things!
 This is an example of configuring another non-Emacs application using org-mode.  Not only do we write out the configuration at =.config/some-app/config=, we also compute the value that gets stored in this configuration from the Emacs Lisp block above it.
 
 #+NAME: the-value
-#+begin_src emacs-lisp :tangle no
+#+BEGIN_SRC emacs-lisp :tangle no
 
   (+ 55 100)
 
-#+end_src
+#+END_SRC
 
 *NOTE*: Set the =:tangle= parameter below to =.config/some-app/config= for this to work!
 
-#+begin_src conf :tangle no :noweb yes
+#+BEGIN_SRC conf :tangle no :noweb yes
 
   value=<<the-value()>>
 
-#+end_src
+#+END_SRC
 
 * Runtime Performance
 
 Dial the GC threshold back down so that garbage collection happens more frequently but in less time.
 
-#+begin_src emacs-lisp
-
+#+BEGIN_SRC emacs-lisp
   ;; Make gc pauses faster by decreasing the threshold.
   (setq gc-cons-threshold (* 2 1000 1000))
+#+END_SRC
 
-#+end_src
 * Search Everything
-#+begin_src emacs-lisp
+
+#+BEGIN_SRC emacs-lisp
 
 (defun with-octicon (icon str &optional height v-adjust)
   (s-concat (all-the-icons-octicon icon :v-adjust (or v-adjust 0) :height (or height 1)) " " str))
@@ -1103,9 +1159,10 @@ Dial the GC threshold back down so that garbage collection happens more frequent
 );end hydra body
 );end pretty-hydra-find-files
 
-#+end_src
+#+END_SRC
 * Flycheck
-#+begin_src emacs-lisp
+
+#+BEGIN_SRC emacs-lisp
   (use-package flycheck
     :init (global-flycheck-mode))
-#+end_src
+#+END_SRC
