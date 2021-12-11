@@ -1,4 +1,3 @@
-#+title: Emacs From Scratch Configuration
 #+PROPERTY: header-args:emacs-lisp :tangle ./init.el :mkdirp yes
 
 * Welcome!
@@ -15,11 +14,11 @@ The following variables are used to tweak some of the configuration pieces for u
   ;;       in Emacs and init.el will be generated automatically!
 
   ;; You will most likely need to adjust this font size for your system!
-  (defvar wheel/default-font-size 180)
-  (defvar wheel/default-variable-font-size 180)
+  (defvar wheel/default-font-size 120)
+  (defvar wheel/default-variable-font-size 120)
 
   ;; Make frame transparency overridable
-  (defvar wheel/frame-transparency '(90 . 90))
+  (defvar wheel/frame-transparency '(60 . 60))
 
 #+END_SRC
 
@@ -204,7 +203,7 @@ This configuration uses [[https://evil.readthedocs.io/en/latest/index.html][evil
     :after evil
     :config
     (general-create-definer wheel/leader-keys
-      :keymaps '(normal insert visual emacs)
+      :keymaps '(normal visual)
       :prefix "SPC"
       :global-prefix "C-SPC")
 
@@ -485,8 +484,268 @@ This is an example of using [[https://github.com/abo-abo/hydra][Hydra]] to desig
 
 [[https://orgmode.org/][Org Mode]] is one of the hallmark features of Emacs.  It is a rich document editor, project planner, task and time tracker, blogging engine, and literate coding utility all wrapped up in one package.
 
-** Basic Configuration
+** Keybinding
+#+BEGIN_SRC emacs-lisp
+  (general-define-key
+  :states 'normal
+   :keymaps 'org-mode-map
+   :prefix "SPC"
+   "'" 'org-edit-special
+   "c" 'org-capture
 
+   ;; Clock
+   ;; These keybindings should match those under the "aoC" prefix (below)
+   "Cc" 'org-clock-cancel
+   "Cd" 'org-clock-display
+   "Ce" 'org-evaluate-time-range
+   "Cg" 'org-clock-goto
+   "Ci" 'org-clock-in
+   "CI" 'org-clock-in-last
+   "Cj" 'spacemacs/org-clock-jump-to-current-clock
+   "Co" 'org-clock-out
+   "CR" 'org-clock-report
+   "Cr" 'org-resolve-clocks
+
+   "dd" 'org-deadline
+   "ds" 'org-schedule
+   "dt" 'org-time-stamp
+   "dT" 'org-time-stamp-inactive
+   "ee" 'org-export-dispatch
+   "fi" 'org-feed-goto-inbox
+   "fu" 'org-feed-update-all
+
+   "a" 'org-agenda
+
+   "p" 'org-priority
+
+   "Tc" 'org-toggle-checkbox
+   "Te" 'org-toggle-pretty-entities
+   "Ti" 'org-toggle-inline-images
+   "Tn" 'org-num-mode
+   "Tl" 'org-toggle-link-display
+   "Tt" 'org-show-todo-tree
+   "TT" 'org-todo
+   "TV" 'space-doc-mode
+   "Tx" 'org-latex-preview
+
+   ;; More cycling options (timestamps, headlines, items, properties)
+   "L" 'org-shiftright
+   "H" 'org-shiftleft
+   "J" 'org-shiftdown
+   "K" 'org-shiftup
+
+   ;; Change between TODO sets
+   "C-S-l" 'org-shiftcontrolright
+   "C-S-h" 'org-shiftcontrolleft
+   "C-S-j" 'org-shiftcontroldown
+   "C-S-k" 'org-shiftcontrolup
+
+   ;; Subtree editing
+   "sa" 'org-toggle-archive-tag
+   "sA" 'org-archive-subtree-default
+   "sb" 'org-tree-to-indirect-buffer
+   "sd" 'org-cut-subtree
+   "sy" 'org-copy-subtree
+   "sh" 'org-promote-subtree
+   "sj" 'org-move-subtree-down
+   "sk" 'org-move-subtree-up
+   "sl" 'org-demote-subtree
+   "sn" 'org-narrow-to-subtree
+   "sw" 'widen
+   "sr" 'org-refile
+   "ss" 'org-sparse-tree
+   "sS" 'org-sort
+
+   ;; tables
+   "ta" 'org-table-align
+   "tb" 'org-table-blank-field
+   "tc" 'org-table-convert
+   "tdc" 'org-table-delete-column
+   "tdr" 'org-table-kill-row
+   "te" 'org-table-eval-formula
+   "tE" 'org-table-export
+   "tf" 'org-table-field-info
+   "th" 'org-table-previous-field
+   "tH" 'org-table-move-column-left
+   "tic" 'org-table-insert-column
+   "tih" 'org-table-insert-hline
+   "tiH" 'org-table-hline-and-move
+   "tir" 'org-table-insert-row
+   "tI" 'org-table-import
+   "tj" 'org-table-next-row
+   "tJ" 'org-table-move-row-down
+   "tK" 'org-table-move-row-up
+   "tl" 'org-table-next-field
+   "tL" 'org-table-move-column-right
+   "tn" 'org-table-create
+   "tN" 'org-table-create-with-table.el
+   "tr" 'org-table-recalculate
+   "tR" 'org-table-recalculate-buffer-tables
+   "ts" 'org-table-sort-lines
+   "ttf" 'org-table-toggle-formula-debugger
+   "tto" 'org-table-toggle-coordinate-overlays
+   "tw" 'org-table-wrap-region
+
+   ;; Source blocks / org-babel
+   "bp"     'org-babel-previous-src-block
+   "bn"     'org-babel-next-src-block
+   "be"     'org-babel-execute-maybe
+   "bo"     'org-babel-open-src-block-result
+   "bv"     'org-babel-expand-src-block
+   "bu"     'org-babel-goto-src-block-head
+   "bg"     'org-babel-goto-named-src-block
+   "br"     'org-babel-goto-named-result
+   "bb"     'org-babel-execute-buffer
+   "bs"     'org-babel-execute-subtree
+   "bd"     'org-babel-demarcate-block
+   "bt"     'org-babel-tangle
+   "bf"     'org-babel-tangle-file
+   "bc"     'org-babel-check-src-block
+   "bj"     'org-babel-insert-header-arg
+   "bl"     'org-babel-load-in-session
+   "bi"     'org-babel-lob-ingest
+   "bI"     'org-babel-view-src-block-info
+   "bz"     'org-babel-switch-to-session
+   "bZ"     'org-babel-switch-to-session-with-code
+   "ba"     'org-babel-sha1-hash
+   "bx"     'org-babel-do-key-sequence-in-edit-buffer
+   "b."     'spacemacs/org-babel-transient-state/body
+   )
+#+END_SRC
+** Basic Configuration
+#+BEGIN_SRC emacs-lisp
+
+(defun wheel/org-mode-setup ()
+  (org-indent-mode)
+  (variable-pitch-mode 1)
+  (visual-line-mode 1))
+
+(use-package org
+  :pin org
+  :commands (org-capture org-agenda)
+  :hook (org-mode . wheel/org-mode-setup)
+  :config
+  (set-face-foreground 'org-hide "black")
+  (setq org-ellipsis " ▾")
+
+  (setq org-agenda-start-with-log-mode t)
+  (setq org-log-done 'time)
+  (setq org-log-into-drawer t)
+
+  (setq org-agenda-files
+        '("~/doc/todo.org"))
+
+  (require 'org-habit)
+  (add-to-list 'org-modules 'org-habit)
+  (setq org-habit-graph-column 60)
+
+  (setq org-todo-keywords
+    '((sequence "TODO(t)" "DOING(d!)" "|" "CLOSE(C!)")
+      (sequence "BACKLOG(b)" "PLAN(p)" "READY(r)" "ACTIVE(a)" "REVIEW(v)" "WAIT(w@/!)" "HOLD(h)" "|" "COMPLETED(c!)" "CANC(k@)")))
+
+  (setq org-refile-targets
+    '(("archive.org" :maxlevel . 1)
+      ("tasks.org" :maxlevel . 1)))
+
+  ;; Save Org buffers after refiling!
+  (advice-add 'org-refile :after 'org-save-all-org-buffers)
+
+  (setq org-tag-alist
+    '((:startgroup)
+       ; Put mutually exclusive tags here
+       ("@home" . ?H)
+       ("@work" . ?W)
+       (:endgroup)
+       ("@errand" . ?E)
+       ("agenda" . ?a)
+       ("planning" . ?p)
+       ("publish" . ?P)
+       ("batch" . ?b)
+       ("note" . ?n)
+       ("idea" . ?i)
+       ("dts" . ?d)
+       ("project_development" . ?P)))
+
+  ;; Configure custom agenda views
+  (setq org-agenda-custom-commands
+   '(("d" "Dashboard"
+     ((agenda "" ((org-deadline-warning-days 7)))
+      (todo "NEXT"
+        ((org-agenda-overriding-header "Next Tasks")))
+      (tags-todo "agenda/ACTIVE" ((org-agenda-overriding-header "Active Projects")))))
+
+    ("n" "Next Tasks"
+     ((todo "NEXT"
+        ((org-agenda-overriding-header "Next Tasks")))))
+
+    ("W" "Work Tasks" tags-todo "+work-email")
+
+    ;; Low-effort next actions
+    ("e" tags-todo "+TODO=\"NEXT\"+Effort<15&+Effort>0"
+     ((org-agenda-overriding-header "Low Effort Tasks")
+      (org-agenda-max-todos 20)
+      (org-agenda-files org-agenda-files)))
+
+    ("w" "Workflow Status"
+     ((todo "WAIT"
+            ((org-agenda-overriding-header "Waiting on External")
+             (org-agenda-files org-agenda-files)))
+      (todo "REVIEW"
+            ((org-agenda-overriding-header "In Review")
+             (org-agenda-files org-agenda-files)))
+      (todo "PLAN"
+            ((org-agenda-overriding-header "In Planning")
+             (org-agenda-todo-list-sublevels nil)
+             (org-agenda-files org-agenda-files)))
+      (todo "BACKLOG"
+            ((org-agenda-overriding-header "Project Backlog")
+             (org-agenda-todo-list-sublevels nil)
+             (org-agenda-files org-agenda-files)))
+      (todo "READY"
+            ((org-agenda-overriding-header "Ready for Work")
+             (org-agenda-files org-agenda-files)))
+      (todo "ACTIVE"
+            ((org-agenda-overriding-header "Active Projects")
+             (org-agenda-files org-agenda-files)))
+      (todo "COMPLETED"
+            ((org-agenda-overriding-header "Completed Projects")
+             (org-agenda-files org-agenda-files)))
+      (todo "CANC"
+            ((org-agenda-overriding-header "Cancelled Projects")
+             (org-agenda-files org-agenda-files)))))))
+
+  (setq org-capture-templates
+    `(("t" "Tasks / Projects")
+      ("tt" "Task" entry (file+olp "~/doc/todo.org" "Inbox")
+           "* TODO %?\n  %U\n  %a\n  %i" :empty-lines 1)
+
+      ("j" "Journal Entries")
+      ("jj" "Journal" entry
+           (file+olp+datetree "~/doc/journal.org")
+           "\n* %<%I:%M %p> - Journal :journal:\n\n%?\n\n"
+           ;; ,(dw/read-file-as-string "~/Notes/Templates/Daily.org")
+           :clock-in :clock-resume
+           :empty-lines 1)
+      ("jm" "Meeting" entry
+           (file+olp+datetree "~/doc/journal.org")
+           "* %<%I:%M %p> - %a :meetings:\n\n%?\n\n"
+           :clock-in :clock-resume
+           :empty-lines 1)
+
+      ("w" "Workflows")
+      ("we" "Checking Email" entry (file+olp+datetree "~/doc/journal.org")
+           "* Checking Email :email:\n\n%?" :clock-in :clock-resume :empty-lines 1)
+
+      ("m" "Metrics Capture")
+      ("mw" "Weight" table-line (file+headline "~/metrics.org" "Drink")
+       "| %U | %^{Weight} | %^{Notes} |" :kill-buffer t)))
+
+  (define-key global-map (kbd "C-c j")
+    (lambda () (interactive) (org-capture nil "jj")))
+
+  (wheel/org-font-setup))
+
+#+END_SRC
 ** Better Font Faces
 
 The =wheel/org-font-setup= function configures various text faces to tweak the sizes of headings and use variable width fonts in most cases so that it looks more like we're editing a document in =org-mode=.  We switch back to fixed width (monospace) fonts for code blocks and tables so that they display correctly.
@@ -576,13 +835,13 @@ This snippet adds a hook to =org-mode= buffers so that =wheel/org-babel-tangle-c
 #+END_SRC
 ** Center Org Buffers
 #+BEGIN_SRC emacs-lisp
-(defun efs/org-mode-visual-fill ()
+(defun wheel/org-mode-visual-fill ()
   (setq visual-fill-column-width 100
         visual-fill-column-center-text t)
   (visual-fill-column-mode 1))
 
 (use-package visual-fill-column
-  :hook (org-mode . efs/org-mode-visual-fill))
+  :hook (org-mode . wheel/org-mode-visual-fill))
 #+END_SRC
 * Development
 ** Languages
@@ -734,15 +993,22 @@ There are a number of other language servers for Python so if you find that =pyl
       (interactive)
       (when (and (executable-find "yapf") buffer-file-name)
 	(call-process "yapf" nil nil nil "-i" buffer-file-name)))
-    :hook (python-mode . (lambda ()
-			   (require 'lsp-pyright)
-			   (add-hook 'after-save-hook #'lsp-pyright-format-buffer t t)))
+    :hook (python-mode . (lambda () (require 'lsp-pyright)))
     :init (when (executable-find "python3")
 	    (setq lsp-pyright-python-executable-cmd "python3")))
 
   (setq enable-local-variables :safe)
+			   ;;(add-hook 'after-save-hook #'lsp-pyright-format-buffer t t)))
 #+END_SRC
 
+*** Scheme
+#+BEGIN_SRC emacs-lisp
+  (use-package geiser
+    :config
+    (setq geiser-scheme-binary "/usr/bin/mit-scheme"))
+  (use-package geiser-chez)
+  (use-package paredit)
+#+END_SRC
 ** Company Mode
 
 [[http://company-mode.github.io/][Company Mode]] provides a nicer in-buffer completion interface than =completion-at-point= which is more reminiscent of what you would expect from an IDE.  We add a simple configuration to make the keybindings a little more useful (=TAB= now completes the selection and initiates completion at the current location if needed).
@@ -782,7 +1048,7 @@ We also use [[https://github.com/sebastiencs/company-box][company-box]] to furth
     :init
     ;; NOTE: Set this to the folder where you keep your Git repos!
     (when (file-directory-p "~/code")
-      (setq projectile-project-search-path '("~/Code")))
+      (setq projectile-project-search-path '("~/code")))
     (setq projectile-switch-project-action #'projectile-dired))
 
   (use-package counsel-projectile
@@ -1166,3 +1432,4 @@ Dial the GC threshold back down so that garbage collection happens more frequent
   (use-package flycheck
     :init (global-flycheck-mode))
 #+END_SRC
+
