@@ -833,16 +833,6 @@ This snippet adds a hook to =org-mode= buffers so that =wheel/org-babel-tangle-c
   :custom
   (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
 #+END_SRC
-** Center Org Buffers
-#+BEGIN_SRC emacs-lisp
-(defun wheel/org-mode-visual-fill ()
-  (setq visual-fill-column-width 100
-        visual-fill-column-center-text t)
-  (visual-fill-column-mode 1))
-
-(use-package visual-fill-column
-  :hook (org-mode . wheel/org-mode-visual-fill))
-#+END_SRC
 * Development
 ** Languages
 *** IDE Features with lsp-mode
